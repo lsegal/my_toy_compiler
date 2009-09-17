@@ -57,9 +57,9 @@ public:
 class NBinaryOperator : public NExpression {
 public:
 	int op;
-	const NExpression& lhs;
-	const NExpression& rhs;
-	NBinaryOperator(const NExpression& lhs, int op, const NExpression& rhs) :
+	NExpression& lhs;
+	NExpression& rhs;
+	NBinaryOperator(NExpression& lhs, int op, NExpression& rhs) :
 		lhs(lhs), rhs(rhs), op(op) { }
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };

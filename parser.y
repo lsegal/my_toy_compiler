@@ -26,6 +26,7 @@ NBlock *programBlock;
 %token <node> TINTEGER TDOUBLE
 %token <token> TCEQ TCNE TCLT TCLE TCGT TCGE TEQUAL
 %token <token> TLPAREN TRPAREN TLBRACE TRBRACE TCOMMA TDOT
+%token <token> TPLUS TMINUS TMUL TDIV
 %type <ident> ident
 %type <expr> numeric expr 
 %type <varvec> func_decl_args
@@ -33,6 +34,9 @@ NBlock *programBlock;
 %type <block> program stmts block
 %type <stmt> stmt var_decl func_decl
 %type <token> comparison
+
+%left TPLUS TMINUS
+%left TMUL TDIV
 
 %start program
 
@@ -61,8 +65,8 @@ func_decl : ident ident TLPAREN func_decl_args TRPAREN block
 			{ $$ = new NFunctionDeclaration(*$1, *$2, *$4, *$6); delete $4; }
 		  ;
 	
-func_decl_args : /*blank*/  { $$ = new std::vector<NVariableDeclaration*>(); }
-		  | var_decl { $$ = new std::vector<NVariableDeclaration*>(); $$->push_back($<var_decl>1); }
+func_decl_args : /*blank*/  { $$ = new VariableList(); }
+		  | var_decl { $$ = new VariableList(); $$->push_back($<var_decl>1); }
 		  | func_decl_args TCOMMA var_decl { $1->push_back($<var_decl>3); }
 		  ;
 
@@ -77,15 +81,26 @@ expr : ident TEQUAL expr { $$ = new NAssignment(*$<ident>1, *$3); }
 	 | ident TLPAREN call_args TRPAREN { $$ = new NMethodCall(*$1, *$3); delete $3; }
 	 | ident { $<ident>$ = $1; }
 	 | numeric
-	 | expr comparison expr { $$ = new NBinaryOperator(*$1, (int)$2, *$3); }
+ 	 | expr comparison expr { printf("XXX:%d\n", $2); $$ = new NBinaryOperator(*$1, $2, *$3); }
+     | TLPAREN expr TRPAREN { $$ = $2; }
 	 ;
 	
-call_args : /*blank*/  { $$ = new std::vector<NExpression*>(); }
-		  | expr { $$ = new std::vector<NExpression*>(); $$->push_back($1); }
+call_args : /*blank*/  { $$ = new ExpressionList(); }
+		  | expr { $$ = new ExpressionList(); $$->push_back($1); }
 		  | call_args TCOMMA expr  { $1->push_back($3); }
 		  ;
 
-comparison : TCEQ | TCNE | TCLT | TCLE | TCGT | TCGE;
+comparison : TCEQ { $$ = TCEQ; }  
+		   | TCNE { $$ = TCNE; }  
+		   | TCLT { $$ = TCLT; }  
+		   | TCLE { $$ = TCLE; }  
+		   | TCGT { $$ = TCGT; }  
+		   | TCGE { $$ = TCGE; }  
+		   | TPLUS { $$ = TPLUS; } 
+		   | TMINUS { $$ = TMINUS; }  
+		   | TMUL { $$ = TMUL; }  
+		   | TDIV { $$ = TDIV; } 
+		   ;
 
 %%
 

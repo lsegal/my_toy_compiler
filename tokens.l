@@ -22,5 +22,9 @@ static std::string last_token;
 "}"						return TRBRACE;
 "."						return TDOT;
 ","						return TCOMMA;
+"+"						return TPLUS;
+"-"						return TMINUS;
+"*"						return TMUL;
+"/"						return TDIV;
 
 %%

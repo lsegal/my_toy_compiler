@@ -1,5 +1,6 @@
 #include "node.h"
 #include "codegen.h"
+#include "parser.hpp"
 
 using namespace std;
 
@@ -79,7 +80,21 @@ Value* NMethodCall::codeGen(CodeGenContext& context)
 
 Value* NBinaryOperator::codeGen(CodeGenContext& context)
 {
+	std::cout << "Creating binary operation " << op << endl;
+	Instruction::BinaryOps instr;
+	switch (op) {
+		case TPLUS: 	instr = Instruction::Add; goto math;
+		case TMINUS: 	instr = Instruction::Sub; goto math;
+		case TMUL: 		instr = Instruction::Mul; goto math;
+		case TDIV: 		instr = Instruction::SDiv; goto math;
+				
+		/* TODO comparison */
+	}
+
 	return NULL;
+math:
+	return BinaryOperator::Create(instr, lhs.codeGen(context), 
+		rhs.codeGen(context), "", context.currentBlock());
 }
 
 Value* NAssignment::codeGen(CodeGenContext& context)

@@ -4,7 +4,7 @@ clean:
 	rm parser.cpp parser tokens.inc
 
 parser.cpp: parser.y
-	bison -o $@ $^
+	bison -d -o $@ $^
 
 tokens.inc: tokens.l
 	lex -o $@ $^
