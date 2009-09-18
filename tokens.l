@@ -1,7 +1,9 @@
 %{
-// Keep track of our last token
-static std::string last_token;
-#define SAVE_TOKEN last_token = std::string(yytext, yyleng)
+#include <string>
+#include "node.h"
+#include "parser.hpp"
+#define SAVE_TOKEN yylval.string = new std::string(yytext, yyleng)
+extern "C" int yywrap() { }
 %}
 
 %%

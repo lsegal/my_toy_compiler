@@ -1,13 +1,9 @@
 %{
-#define DEBUG std::cout << typeid(*yyval.YYSTYPE::block).name() << std::endl;
-#include <typeinfo>
-#include "node.h"
-#include "tokens.inc"
+	#include "node.h"
+	NBlock *programBlock; /* the top level root node of our final AST */
 
-NBlock *programBlock; /* the top level root node of our final AST */
-
-int yywrap() { }
-void yyerror(const char *s) { printf("ERROR: %s\n", s); }
+	extern int yylex();
+	void yyerror(const char *s) { printf("ERROR: %s\n", s); }
 %}
 
 /* Represents the many different ways we can access our data */
@@ -20,6 +16,7 @@ void yyerror(const char *s) { printf("ERROR: %s\n", s); }
 	NVariableDeclaration *var_decl;
 	std::vector<NVariableDeclaration*> *varvec;
 	std::vector<NExpression*> *exprvec;
+	std::string *string;
 	int token;
 }
 
@@ -27,8 +24,7 @@ void yyerror(const char *s) { printf("ERROR: %s\n", s); }
    match our tokens.l lex file. We also define the node type
    they represent.
  */
-%token <node> TIDENTIFIER
-%token <node> TINTEGER TDOUBLE
+%token <string> TIDENTIFIER TINTEGER TDOUBLE
 %token <token> TCEQ TCNE TCLT TCLE TCGT TCGE TEQUAL
 %token <token> TLPAREN TRPAREN TLBRACE TRBRACE TCOMMA TDOT
 %token <token> TPLUS TMINUS TMUL TDIV
@@ -62,7 +58,7 @@ stmts : stmt { $$ = new NBlock(); $$->statements.push_back($<stmt>1); }
 	  ;
 
 stmt : var_decl | func_decl
-	 | expr 
+	 | expr { $$ = new NExpressionStatement(*$1); }
      ;
 
 block : TLBRACE stmts TRBRACE { $$ = $2; }
@@ -82,11 +78,11 @@ func_decl_args : /*blank*/  { $$ = new VariableList(); }
 		  | func_decl_args TCOMMA var_decl { $1->push_back($<var_decl>3); }
 		  ;
 
-ident : TIDENTIFIER { $$ = new NIdentifier(last_token); }
+ident : TIDENTIFIER { $$ = new NIdentifier(*$1); delete $1; }
 	  ;
 
-numeric : TINTEGER { $$ = new NInteger(atol(last_token.c_str())); }
-		| TDOUBLE { $$ = new NDouble(atof(last_token.c_str())); }
+numeric : TINTEGER { $$ = new NInteger(atol($1->c_str())); delete $1; }
+		| TDOUBLE { $$ = new NDouble(atof($1->c_str())); delete $1; }
 		;
 	
 expr : ident TEQUAL expr { $$ = new NAssignment(*$<ident>1, *$3); }
