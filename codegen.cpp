@@ -4,6 +4,44 @@
 
 using namespace std;
 
+/* Compile the AST into a module */
+void CodeGenContext::generateCode(NBlock& root)
+{
+	std::cout << "Generating code...\n";
+	
+	/* Create the top level interpreter function to call as entry */
+	vector<const Type*> argTypes;
+	FunctionType *ftype = FunctionType::get(Type::VoidTy, argTypes, false);
+	mainFunction = Function::Create(ftype, GlobalValue::InternalLinkage, "main", module);
+	BasicBlock *bblock = BasicBlock::Create("entry", mainFunction, 0);
+	
+	/* Push a new variable/block context */
+	pushBlock(bblock);
+	root.codeGen(*this); /* emit bytecode for the toplevel block */
+	ReturnInst::Create(bblock);
+	popBlock();
+	
+	/* Print the bytecode in a human-readable format 
+	   to see if our program compiled properly
+	 */
+	std::cout << "Code is generated.\n";
+	PassManager pm;
+	pm.add(createPrintModulePass(&outs()));
+	pm.run(*module);
+}
+
+/* Executes the AST by running the main function */
+GenericValue CodeGenContext::runCode() {
+	std::cout << "Running code...\n";
+	ExistingModuleProvider *mp = new ExistingModuleProvider(module);
+	ExecutionEngine *ee = ExecutionEngine::create(mp, false);
+	vector<GenericValue> noargs;
+	GenericValue v = ee->runFunction(mainFunction, noargs);
+	std::cout << "Code was run.\n";
+	return v;
+}
+
+/* Returns an LLVM type based on the identifier */
 static const Type *typeOf(const NIdentifier& type) 
 {
 	if (type.name.compare("int") == 0) {
@@ -15,30 +53,7 @@ static const Type *typeOf(const NIdentifier& type)
 	return Type::VoidTy;
 }
 
-void CodeGenContext::generateCode(NBlock& root)
-{
-	std::cout << "generating code...\n";
-	vector<const Type*> argTypes;
-	FunctionType *ftype = FunctionType::get(Type::VoidTy, argTypes, false);
-	mainFunction = Function::Create(ftype, GlobalValue::InternalLinkage, "main", module);
-	BasicBlock *bblock = BasicBlock::Create("entry", mainFunction, 0);
-	pushBlock(bblock);
-	root.codeGen(*this);
-	ReturnInst::Create(bblock);
-	popBlock();
-	std::cout << "code is generated.\n";
-	PassManager pm;
-	pm.add(createPrintModulePass(&outs()));
-	pm.run(*module);
-}
-
-GenericValue CodeGenContext::runCode() {
-	std::cout << "running code...\n";
-	ExistingModuleProvider *mp = new ExistingModuleProvider(module);
-	ExecutionEngine *ee = ExecutionEngine::create(mp, false);
-	vector<GenericValue> noargs;
-	return ee->runFunction(mainFunction, noargs);
-}
+/* -- Code Generation -- */
 
 Value* NInteger::codeGen(CodeGenContext& context)
 {

@@ -89,7 +89,7 @@ expr : ident TEQUAL expr { $$ = new NAssignment(*$<ident>1, *$3); }
 	 | ident TLPAREN call_args TRPAREN { $$ = new NMethodCall(*$1, *$3); delete $3; }
 	 | ident { $<ident>$ = $1; }
 	 | numeric
- 	 | expr comparison expr { printf("XXX:%d\n", $2); $$ = new NBinaryOperator(*$1, $2, *$3); }
+ 	 | expr comparison expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
      | TLPAREN expr TRPAREN { $$ = $2; }
 	 ;
 	
@@ -98,16 +98,8 @@ call_args : /*blank*/  { $$ = new ExpressionList(); }
 		  | call_args TCOMMA expr  { $1->push_back($3); }
 		  ;
 
-comparison : TCEQ { $$ = TCEQ; }  
-		   | TCNE { $$ = TCNE; }  
-		   | TCLT { $$ = TCLT; }  
-		   | TCLE { $$ = TCLE; }  
-		   | TCGT { $$ = TCGT; }  
-		   | TCGE { $$ = TCGE; }  
-		   | TPLUS { $$ = TPLUS; } 
-		   | TMINUS { $$ = TMINUS; }  
-		   | TMUL { $$ = TMUL; }  
-		   | TDIV { $$ = TDIV; } 
+comparison : TCEQ | TCNE | TCLT | TCLE | TCGT | TCGE 
+		   | TPLUS | TMINUS | TMUL | TDIV
 		   ;
 
 %%
