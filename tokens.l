@@ -1,4 +1,5 @@
 %{
+// Keep track of our last token
 static std::string last_token;
 #define SAVE_TOKEN last_token = std::string(yytext, yyleng)
 %}
@@ -6,9 +7,9 @@ static std::string last_token;
 %%
 
 [ \t\n]					;
-[a-zA-Z_][a-zA-Z0-9_]* 	{ SAVE_TOKEN; return TIDENTIFIER; }
-[0-9]+\.[0-9]* 			{ SAVE_TOKEN; return TDOUBLE; }
-[0-9]+					{ SAVE_TOKEN; return TINTEGER; }
+[a-zA-Z_][a-zA-Z0-9_]* 	SAVE_TOKEN; return TIDENTIFIER;
+[0-9]+\.[0-9]* 			SAVE_TOKEN; return TDOUBLE;
+[0-9]+					SAVE_TOKEN; return TINTEGER;
 "="						return TEQUAL;
 "=="					return TCEQ;
 "!="					return TCNE;
@@ -26,5 +27,6 @@ static std::string last_token;
 "-"						return TMINUS;
 "*"						return TMUL;
 "/"						return TDIV;
+.						printf("Unknown token!\n"); yyterminate();
 
 %%

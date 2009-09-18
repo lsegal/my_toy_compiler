@@ -1,15 +1,16 @@
 %{
-#include <iostream>
+#define DEBUG std::cout << typeid(*yyval.YYSTYPE::block).name() << std::endl;
 #include <typeinfo>
 #include "node.h"
 #include "tokens.inc"
-#define DEBUG std::cout << typeid(*yyval.YYSTYPE::block).name() << std::endl;
 
-void yyerror(const char *);
-void debug(char *, Node*);
-NBlock *programBlock;
+NBlock *programBlock; /* the top level root node of our final AST */
+
+int yywrap() { }
+void yyerror(const char *s) { printf("ERROR: %s\n", s); }
 %}
 
+/* Represents the many different ways we can access our data */
 %union {
 	Node *node;
 	NBlock *block;
@@ -22,11 +23,21 @@ NBlock *programBlock;
 	int token;
 }
 
+/* Define our terminal symbols (tokens). This should
+   match our tokens.l lex file. We also define the node type
+   they represent.
+ */
 %token <node> TIDENTIFIER
 %token <node> TINTEGER TDOUBLE
 %token <token> TCEQ TCNE TCLT TCLE TCGT TCGE TEQUAL
 %token <token> TLPAREN TRPAREN TLBRACE TRBRACE TCOMMA TDOT
 %token <token> TPLUS TMINUS TMUL TDIV
+
+/* Define the type of node our nonterminal symbols represent.
+   The types refer to the %union declaration above. Ex: when
+   we call an ident (defined by union type ident) we are really
+   calling an (NIdentifier*). It makes the compiler happy.
+ */
 %type <ident> ident
 %type <expr> numeric expr 
 %type <varvec> func_decl_args
@@ -35,6 +46,7 @@ NBlock *programBlock;
 %type <stmt> stmt var_decl func_decl
 %type <token> comparison
 
+/* Operator precedence for mathematical operators */
 %left TPLUS TMINUS
 %left TMUL TDIV
 
@@ -50,7 +62,7 @@ stmts : stmt { $$ = new NBlock(); $$->statements.push_back($<stmt>1); }
 	  ;
 
 stmt : var_decl | func_decl
-	 | expr { $$ = new NExpressionStatement(*$1); }
+	 | expr 
      ;
 
 block : TLBRACE stmts TRBRACE { $$ = $2; }
@@ -103,15 +115,3 @@ comparison : TCEQ { $$ = TCEQ; }
 		   ;
 
 %%
-
-void debug(char *msg, Node* node) 
-{
-	std::cout << msg << " :: " << typeid(*node).name() << std::endl;
-}
-
-void yyerror(const char *s)
-{
-	printf("ERROR: %s\n", s);
-}
-
-int yywrap() { }
