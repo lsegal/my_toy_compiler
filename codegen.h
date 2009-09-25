@@ -27,9 +27,18 @@ class CodeGenContext {
     Function *mainFunction;
 
 public:
+	Value *cObject;
     Module *module;
+	Function *objallocFunction;
+	Function *putSlotFunction;
+	Function *getSlotFunction;
+	Function *newobjFunction;
     CodeGenContext() { module = new Module("main"); }
     
+	const StructType* addStructType(char *name, size_t numArgs, ...);
+	FunctionType* functionType(const Type* retType, bool varargs, size_t numArgs, ...);
+	Function* addExternalFunction(char *name, FunctionType *ftype);
+	Function *addFunction(char *name, FunctionType *ftype, void (^block)(BasicBlock *));
     void generateCode(NBlock& root);
     GenericValue runCode();
     std::map<std::string, Value*>& locals() { return blocks.top()->locals; }

@@ -6,9 +6,11 @@ class CodeGenContext;
 class NStatement;
 class NExpression;
 class NVariableDeclaration;
+class NIdentifier;
 
 typedef std::vector<NStatement*> StatementList;
 typedef std::vector<NExpression*> ExpressionList;
+typedef std::vector<NIdentifier*> IdentifierList;
 typedef std::vector<NVariableDeclaration*> VariableList;
 
 class Node {
@@ -44,13 +46,28 @@ public:
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
+class NString : public NExpression {
+public:
+	std::string value;
+	NString(const std::string& value) : value(value) { }
+	virtual llvm::Value* codeGen(CodeGenContext& context);
+};
+
+class NReference : public NExpression {
+public:
+	IdentifierList refs;
+	NReference() { }
+	NReference(NIdentifier& id) { refs.push_back(&id); }
+	virtual llvm::Value* codeGen(CodeGenContext& context);
+};
+
 class NMethodCall : public NExpression {
 public:
-	const NIdentifier& id;
+	const NReference& ref;
 	ExpressionList arguments;
-	NMethodCall(const NIdentifier& id, ExpressionList& arguments) :
-		id(id), arguments(arguments) { }
-	NMethodCall(const NIdentifier& id) : id(id) { }
+	NMethodCall(const NReference& ref, ExpressionList& arguments) :
+		ref(ref), arguments(arguments) { }
+	NMethodCall(const NReference& ref) : ref(ref) { }
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
@@ -66,9 +83,9 @@ public:
 
 class NAssignment : public NExpression {
 public:
-	NIdentifier& lhs;
+	NReference& lhs;
 	NExpression& rhs;
-	NAssignment(NIdentifier& lhs, NExpression& rhs) : 
+	NAssignment(NReference& lhs, NExpression& rhs) : 
 		lhs(lhs), rhs(rhs) { }
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
