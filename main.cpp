@@ -11,10 +11,12 @@ int main(int argc, char **argv)
 {
 	yyparse();
 	std::cout << programBlock << endl;
-
+        # see http://comments.gmane.org/gmane.comp.compilers.llvm.devel/33877
+	InitializeNativeTarget();
 	CodeGenContext context;
 	context.generateCode(*programBlock);
 	context.runCode();
 	
 	return 0;
 }
+
