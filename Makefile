@@ -27,6 +27,6 @@ tokens.cpp: tokens.l parser.hpp
 
 
 parser: $(OBJS)
-	g++ -o $@ $(LDFLAGS) $(OBJS) $(LIBS)
+	g++ -o $@ $(OBJS) $(LIBS) $(LDFLAGS)
 
 
