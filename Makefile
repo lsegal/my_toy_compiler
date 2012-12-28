@@ -5,11 +5,9 @@ OBJS = parser.o  \
        main.o    \
        tokens.o  \
 
-LLVM_MODULES = core jit native
-
-CPPFLAGS = `llvm-config --cppflags $(LLVM_MODULES)`
-LDFLAGS = `llvm-config --ldflags $(LLVM_MODULES)`
-LIBS = `llvm-config --libs $(LLVM_MODULES)`
+CPPFLAGS = `llvm-config --cppflags`
+LDFLAGS = `llvm-config --ldflags`
+LIBS = `llvm-config --libs`
 
 clean:
 	$(RM) -rf parser.cpp parser.hpp parser tokens.cpp $(OBJS)
