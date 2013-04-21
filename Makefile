@@ -4,6 +4,7 @@ OBJS = parser.o  \
        codegen.o \
        main.o    \
        tokens.o  \
+       corefn.o  \
 
 CPPFLAGS = `llvm-config --cppflags`
 LDFLAGS = `llvm-config --ldflags`
