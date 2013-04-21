@@ -3,3 +3,4 @@ int do_math(int a) {
 }
 
 do_math(10)
+echo(15)
