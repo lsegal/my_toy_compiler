@@ -164,8 +164,15 @@ Value* NFunctionDeclaration::codeGen(CodeGenContext& context)
 
 	context.pushBlock(bblock);
 
+	Function::arg_iterator argsValues = function->arg_begin();
+    Value* argumentValue;
+
 	for (it = arguments.begin(); it != arguments.end(); it++) {
 		(**it).codeGen(context);
+		
+		argumentValue = argsValues++;
+		argumentValue->setName((*it)->id.name.c_str());
+		StoreInst *inst = new StoreInst(argumentValue, context.locals()[(*it)->id.name], false, bblock);
 	}
 	
 	block.codeGen(context);
