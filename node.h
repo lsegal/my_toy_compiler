@@ -88,6 +88,14 @@ public:
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
+class NReturnStatement : public NStatement {
+public:
+	NExpression& expression;
+	NReturnStatement(NExpression& expression) : 
+		expression(expression) { }
+	virtual llvm::Value* codeGen(CodeGenContext& context);
+};
+
 class NVariableDeclaration : public NStatement {
 public:
 	const NIdentifier& type;
