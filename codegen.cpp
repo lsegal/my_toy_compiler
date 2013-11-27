@@ -139,6 +139,14 @@ Value* NExpressionStatement::codeGen(CodeGenContext& context)
 	return expression.codeGen(context);
 }
 
+Value* NReturnStatement::codeGen(CodeGenContext& context)
+{
+	std::cout << "Generating return code for " << typeid(expression).name() << endl;
+	Value *returnValue = expression.codeGen(context);
+	context.setCurrentReturnValue(returnValue);
+	return returnValue;
+}
+
 Value* NVariableDeclaration::codeGen(CodeGenContext& context)
 {
 	std::cout << "Creating variable declaration " << type.name << " " << id.name << endl;
@@ -169,7 +177,7 @@ Value* NFunctionDeclaration::codeGen(CodeGenContext& context)
 	}
 	
 	block.codeGen(context);
-	ReturnInst::Create(getGlobalContext(), bblock);
+	ReturnInst::Create(getGlobalContext(), context.getCurrentReturnValue(), bblock);
 
 	context.popBlock();
 	std::cout << "Creating function: " << id.name << endl;
