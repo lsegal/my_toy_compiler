@@ -14,7 +14,7 @@ typedef std::vector<NVariableDeclaration*> VariableList;
 class Node {
 public:
 	virtual ~Node() {}
-	virtual llvm::Value* codeGen(CodeGenContext& context);
+	virtual llvm::Value* codeGen(CodeGenContext& context) { return NULL; }
 };
 
 class NExpression : public Node {
