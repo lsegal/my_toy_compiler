@@ -106,8 +106,6 @@ call_args : /*blank*/  { $$ = new ExpressionList(); }
 		  | call_args TCOMMA expr  { $1->push_back($3); }
 		  ;
 
-comparison : TCEQ | TCNE | TCLT | TCLE | TCGT | TCGE 
-		   | TPLUS | TMINUS | TMUL | TDIV
-		   ;
+comparison : TCEQ | TCNE | TCLT | TCLE | TCGT | TCGE;
 
 %%
