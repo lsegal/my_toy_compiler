@@ -8,6 +8,7 @@
 #include <llvm/PassManager.h>
 #include <llvm/IR/Instructions.h>
 #include <llvm/IR/CallingConv.h>
+#include <llvm/IR/Constants.h>
 #include <llvm/Bitcode/ReaderWriter.h>
 #include <llvm/Analysis/Verifier.h>
 #include <llvm/Assembly/PrintModulePass.h>
