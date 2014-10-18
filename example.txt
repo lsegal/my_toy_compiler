@@ -1,7 +1,7 @@
 int do_math(int a) {
   int x = a * 5
-  return x + 3
+  return x == 5
 }
 
-echo(do_math(11))
+echo(do_math(1))
 echo(do_math(12))

@@ -1,8 +1,11 @@
 #include "node.h"
 #include "codegen.h"
 #include "parser.hpp"
+#include <llvm/IR/IRBuilder.h>
 
 using namespace std;
+
+static IRBuilder<> Builder(getGlobalContext());
 
 /* Compile the AST into a module */
 void CodeGenContext::generateCode(NBlock& root)
@@ -96,13 +99,19 @@ Value* NBinaryOperator::codeGen(CodeGenContext& context)
 {
 	std::cout << "Creating binary operation " << op << endl;
 	Instruction::BinaryOps instr;
+	Instruction::OtherOps instrOther;
 	switch (op) {
 		case TPLUS: 	instr = Instruction::Add; goto math;
 		case TMINUS: 	instr = Instruction::Sub; goto math;
 		case TMUL: 		instr = Instruction::Mul; goto math;
 		case TDIV: 		instr = Instruction::SDiv; goto math;
 				
-		/* TODO comparison */
+    case TCEQ: return CmpInst::Create(Instruction::ICmp, ICmpInst::ICMP_EQ, lhs.codeGen(context), rhs.codeGen(context), "", context.currentBlock());
+    case TCNE: return CmpInst::Create(Instruction::ICmp, ICmpInst::ICMP_NE, lhs.codeGen(context), rhs.codeGen(context), "", context.currentBlock());
+    case TCLT: return CmpInst::Create(Instruction::ICmp, ICmpInst::ICMP_ULT, lhs.codeGen(context), rhs.codeGen(context), "", context.currentBlock());
+    case TCLE: return CmpInst::Create(Instruction::ICmp, ICmpInst::ICMP_ULE, lhs.codeGen(context), rhs.codeGen(context), "", context.currentBlock());
+    case TCGT: return CmpInst::Create(Instruction::ICmp, ICmpInst::ICMP_UGT, lhs.codeGen(context), rhs.codeGen(context), "", context.currentBlock());
+    case TCGE: return CmpInst::Create(Instruction::ICmp, ICmpInst::ICMP_UGE, lhs.codeGen(context), rhs.codeGen(context), "", context.currentBlock());
 	}
 
 	return NULL;
