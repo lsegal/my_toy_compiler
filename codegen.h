@@ -1,3 +1,4 @@
+#pragma once
 #include <stack>
 #include <typeinfo>
 #include <llvm/IR/Module.h>
@@ -9,14 +10,14 @@
 #include <llvm/IR/Instructions.h>
 #include <llvm/IR/CallingConv.h>
 #include <llvm/Bitcode/ReaderWriter.h>
-#include <llvm/Analysis/Verifier.h>
-#include <llvm/Assembly/PrintModulePass.h>
+#include <llvm/IR/Verifier.h>
+#include <llvm/IR/Constants.h>
 //#include <llvm/ModuleProvider.h>
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/ExecutionEngine/GenericValue.h>
 #include <llvm/ExecutionEngine/JIT.h>
 #include <llvm/Support/raw_ostream.h>
-
+#include <llvm/LinkAllPasses.h>
 using namespace llvm;
 
 class NBlock;

@@ -1,14 +1,14 @@
 all: parser
 
 OBJS = parser.o  \
+       corefn.o  \
        codegen.o \
        main.o    \
        tokens.o  \
-       corefn.o  \
 
 CPPFLAGS = `llvm-config --cppflags`
 LDFLAGS = `llvm-config --ldflags`
-LIBS = `llvm-config --libs`
+LIBS = `llvm-config --libs` -lz -ldl -pthread -lcurses
 
 clean:
 	$(RM) -rf parser.cpp parser.hpp parser tokens.cpp $(OBJS)
@@ -22,10 +22,10 @@ tokens.cpp: tokens.l parser.hpp
 	flex -o $@ $^
 
 %.o: %.cpp
-	g++ -c $(CPPFLAGS) -o $@ $<
+	clang++ -std=c++11 -c $(CPPFLAGS) -o $@ $<
 
 
 parser: $(OBJS)
-	g++ -o $@ $(OBJS) $(LIBS) $(LDFLAGS)
+	clang++  -std=c++11 -o $@ $(OBJS) $(LIBS) $(LDFLAGS)
 
 
