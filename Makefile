@@ -6,7 +6,8 @@ OBJS = parser.o  \
        tokens.o  \
        corefn.o  \
 
-CPPFLAGS = `llvm-config --cppflags`
+CPPFLAGS = "-std=c++11"
+CPPFLAGS += `llvm-config --cppflags`
 LDFLAGS = `llvm-config --ldflags`
 LIBS = `llvm-config --libs`
 
@@ -26,6 +27,5 @@ tokens.cpp: tokens.l parser.hpp
 
 
 parser: $(OBJS)
-	g++ -o $@ $(OBJS) $(LIBS) $(LDFLAGS)
-
+	g++ -o $@ $(OBJS) $(LIBS) $(LDFLAGS) -ldl -lpthread
 
