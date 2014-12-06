@@ -26,7 +26,7 @@ void CodeGenContext::generateCode(NBlock& root)
 	 */
 	std::cout << "Code is generated.\n";
 	PassManager pm;
-	pm.add(createPrintModulePass(&outs()));
+	pm.add(createPrintModulePass(outs()));
 	pm.run(*module);
 }
 
@@ -157,6 +157,18 @@ Value* NVariableDeclaration::codeGen(CodeGenContext& context)
 		assn.codeGen(context);
 	}
 	return alloc;
+}
+
+Value* NExternDeclaration::codeGen(CodeGenContext& context)
+{
+    vector<Type*> argTypes;
+    VariableList::const_iterator it;
+    for (it = arguments.begin(); it != arguments.end(); it++) {
+        argTypes.push_back(typeOf((**it).type));
+    }
+    FunctionType *ftype = FunctionType::get(typeOf(type), makeArrayRef(argTypes), false);
+    Function *function = Function::Create(ftype, GlobalValue::ExternalLinkage, id.name.c_str(), context.module);
+    return function;
 }
 
 Value* NFunctionDeclaration::codeGen(CodeGenContext& context)

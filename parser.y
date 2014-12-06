@@ -30,7 +30,7 @@
 %token <token> TCEQ TCNE TCLT TCLE TCGT TCGE TEQUAL
 %token <token> TLPAREN TRPAREN TLBRACE TRBRACE TCOMMA TDOT
 %token <token> TPLUS TMINUS TMUL TDIV
-%token <token> TRETURN
+%token <token> TRETURN TEXTERN
 
 /* Define the type of node our nonterminal symbols represent.
    The types refer to the %union declaration above. Ex: when
@@ -42,7 +42,7 @@
 %type <varvec> func_decl_args
 %type <exprvec> call_args
 %type <block> program stmts block
-%type <stmt> stmt var_decl func_decl
+%type <stmt> stmt var_decl func_decl extern_decl
 %type <token> comparison
 
 /* Operator precedence for mathematical operators */
@@ -60,7 +60,7 @@ stmts : stmt { $$ = new NBlock(); $$->statements.push_back($<stmt>1); }
 	  | stmts stmt { $1->statements.push_back($<stmt>2); }
 	  ;
 
-stmt : var_decl | func_decl
+stmt : var_decl | func_decl | extern_decl
 	 | expr { $$ = new NExpressionStatement(*$1); }
 	 | TRETURN expr { $$ = new NReturnStatement(*$2); }
      ;
@@ -72,7 +72,11 @@ block : TLBRACE stmts TRBRACE { $$ = $2; }
 var_decl : ident ident { $$ = new NVariableDeclaration(*$1, *$2); }
 		 | ident ident TEQUAL expr { $$ = new NVariableDeclaration(*$1, *$2, $4); }
 		 ;
-		
+
+extern_decl : TEXTERN ident ident TLPAREN func_decl_args TRPAREN
+                { $$ = new NExternDeclaration(*$2, *$3, *$5); delete $5; }
+            ;
+
 func_decl : ident ident TLPAREN func_decl_args TRPAREN block 
 			{ $$ = new NFunctionDeclaration(*$1, *$2, *$4, *$6); delete $4; }
 		  ;

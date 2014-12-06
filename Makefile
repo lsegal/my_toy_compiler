@@ -5,10 +5,12 @@ OBJS = parser.o  \
        main.o    \
        tokens.o  \
        corefn.o  \
+	   native.o  \
 
-CPPFLAGS = `llvm-config --cppflags`
-LDFLAGS = `llvm-config --ldflags`
-LIBS = `llvm-config --libs`
+LLVMCONFIG = /opt/llvm-3.5/bin/llvm-config
+CPPFLAGS = `$(LLVMCONFIG) --cppflags` -std=gnu++11
+LDFLAGS = `$(LLVMCONFIG) --ldflags` -lpthread -ldl -lz -ltinfo -rdynamic
+LIBS = `$(LLVMCONFIG) --libs`
 
 clean:
 	$(RM) -rf parser.cpp parser.hpp parser tokens.cpp $(OBJS)
@@ -28,4 +30,5 @@ tokens.cpp: tokens.l parser.hpp
 parser: $(OBJS)
 	g++ -o $@ $(OBJS) $(LIBS) $(LDFLAGS)
 
-
+test: parser example.txt
+	cat example.txt | ./parser

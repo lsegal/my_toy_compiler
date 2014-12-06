@@ -108,6 +108,17 @@ public:
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
+class NExternDeclaration : public NStatement {
+public:
+    const NIdentifier& type;
+    const NIdentifier& id;
+    VariableList arguments;
+    NExternDeclaration(const NIdentifier& type, const NIdentifier& id,
+            const VariableList& arguments) :
+        type(type), id(id), arguments(arguments) {}
+    virtual llvm::Value* codeGen(CodeGenContext& context);
+};
+
 class NFunctionDeclaration : public NStatement {
 public:
 	const NIdentifier& type;
