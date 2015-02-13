@@ -26,7 +26,7 @@ void CodeGenContext::generateCode(NBlock& root)
 	 */
 	std::cout << "Code is generated.\n";
 	PassManager pm;
-	pm.add(createPrintModulePass(outs()));
+	pm.add(createPrintModulePass(&outs()));
 	pm.run(*module);
 }
 
