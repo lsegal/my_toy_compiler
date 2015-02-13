@@ -8,7 +8,7 @@
 #include <llvm/PassManager.h>
 #include <llvm/IR/Instructions.h>
 #include <llvm/IR/CallingConv.h>
-#include <llvm/IR/IRPrintingPasses.h>
+#include <llvm/Assembly/PrintModulePass.h>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/Bitcode/ReaderWriter.h>
 #include <llvm/Support/TargetSelect.h>
