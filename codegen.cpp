@@ -25,15 +25,16 @@ void CodeGenContext::generateCode(NBlock& root)
 	   to see if our program compiled properly
 	 */
 	std::cout << "Code is generated.\n";
-	PassManager pm;
-	pm.add(createPrintModulePass(outs()));
+	PassManager<Module> pm;
+	pm.addPass(PrintModulePass(outs()));
 	pm.run(*module);
 }
 
 /* Executes the AST by running the main function */
 GenericValue CodeGenContext::runCode() {
 	std::cout << "Running code...\n";
-	ExecutionEngine *ee = EngineBuilder(module).create();
+	ExecutionEngine *ee = EngineBuilder( unique_ptr<Module>(module) ).create();
+	ee->finalizeObject();
 	vector<GenericValue> noargs;
 	GenericValue v = ee->runFunction(mainFunction, noargs);
 	std::cout << "Code was run.\n";

@@ -15,6 +15,8 @@ int main(int argc, char **argv)
 	cout << programBlock << endl;
     // see http://comments.gmane.org/gmane.comp.compilers.llvm.devel/33877
 	InitializeNativeTarget();
+	InitializeNativeTargetAsmPrinter();
+	InitializeNativeTargetAsmParser();
 	CodeGenContext context;
 	createCoreFunctions(context);
 	context.generateCode(*programBlock);
