@@ -191,7 +191,7 @@ Value* NFunctionDeclaration::codeGen(CodeGenContext& context)
 	for (it = arguments.begin(); it != arguments.end(); it++) {
 		(**it).codeGen(context);
 		
-		argumentValue = argsValues++;
+		argumentValue = &*argsValues++;
 		argumentValue->setName((*it)->id.name.c_str());
 		StoreInst *inst = new StoreInst(argumentValue, context.locals()[(*it)->id.name], false, bblock);
 	}

@@ -63,7 +63,7 @@ void createEchoFunction(CodeGenContext& context, llvm::Function* printfFn)
     args.push_back(var_ref);
 
     Function::arg_iterator argsValues = func->arg_begin();
-    Value* toPrint = argsValues++;
+    Value* toPrint = &*argsValues++;
     toPrint->setName("toPrint");
     args.push_back(toPrint);
     
