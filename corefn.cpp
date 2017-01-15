@@ -56,7 +56,7 @@ void createEchoFunction(CodeGenContext& context, llvm::Function* printfFn)
     indices.push_back(zero);
     indices.push_back(zero);
     llvm::Constant *var_ref = llvm::ConstantExpr::getGetElementPtr(
-	llvm::ArrayType::get(llvm::IntegerType::get(getGlobalContext(), 8), strlen(constValue+1)),
+	llvm::ArrayType::get(llvm::IntegerType::get(getGlobalContext(), 8), strlen(constValue)+1),
         var, indices);
 
     std::vector<Value*> args;
