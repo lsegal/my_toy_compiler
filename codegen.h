@@ -5,12 +5,13 @@
 #include <llvm/IR/Type.h>
 #include <llvm/IR/DerivedTypes.h>
 #include <llvm/IR/LLVMContext.h>
-#include <llvm/IR/PassManager.h>
+#include <llvm/IR/LegacyPassManager.h>
 #include <llvm/IR/Instructions.h>
 #include <llvm/IR/CallingConv.h>
 #include <llvm/IR/IRPrintingPasses.h>
 #include <llvm/IR/IRBuilder.h>
-#include <llvm/Bitcode/ReaderWriter.h>
+#include <llvm/Bitcode/BitcodeReader.h>
+#include <llvm/Bitcode/BitcodeWriter.h>
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
 #include <llvm/ExecutionEngine/MCJIT.h>
@@ -20,6 +21,8 @@
 using namespace llvm;
 
 class NBlock;
+
+static LLVMContext MyContext;
 
 class CodeGenBlock {
 public:
@@ -33,8 +36,9 @@ class CodeGenContext {
     Function *mainFunction;
 
 public:
+
     Module *module;
-    CodeGenContext() { module = new Module("main", getGlobalContext()); }
+    CodeGenContext() { module = new Module("main", MyContext); }
     
     void generateCode(NBlock& root);
     GenericValue runCode();

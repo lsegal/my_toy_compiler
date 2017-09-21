@@ -11,11 +11,11 @@ extern NBlock* programBlock;
 llvm::Function* createPrintfFunction(CodeGenContext& context)
 {
     std::vector<llvm::Type*> printf_arg_types;
-    printf_arg_types.push_back(llvm::Type::getInt8PtrTy(getGlobalContext())); //char*
+    printf_arg_types.push_back(llvm::Type::getInt8PtrTy(MyContext)); //char*
 
     llvm::FunctionType* printf_type =
         llvm::FunctionType::get(
-            llvm::Type::getInt32Ty(getGlobalContext()), printf_arg_types, true);
+            llvm::Type::getInt32Ty(MyContext), printf_arg_types, true);
 
     llvm::Function *func = llvm::Function::Create(
                 printf_type, llvm::Function::ExternalLinkage,
@@ -29,34 +29,34 @@ llvm::Function* createPrintfFunction(CodeGenContext& context)
 void createEchoFunction(CodeGenContext& context, llvm::Function* printfFn)
 {
     std::vector<llvm::Type*> echo_arg_types;
-    echo_arg_types.push_back(llvm::Type::getInt64Ty(getGlobalContext()));
+    echo_arg_types.push_back(llvm::Type::getInt64Ty(MyContext));
 
     llvm::FunctionType* echo_type =
         llvm::FunctionType::get(
-            llvm::Type::getVoidTy(getGlobalContext()), echo_arg_types, false);
+            llvm::Type::getVoidTy(MyContext), echo_arg_types, false);
 
     llvm::Function *func = llvm::Function::Create(
                 echo_type, llvm::Function::InternalLinkage,
                 llvm::Twine("echo"),
                 context.module
            );
-    llvm::BasicBlock *bblock = llvm::BasicBlock::Create(getGlobalContext(), "entry", func, 0);
+    llvm::BasicBlock *bblock = llvm::BasicBlock::Create(MyContext, "entry", func, 0);
 	context.pushBlock(bblock);
     
     const char *constValue = "%d\n";
-    llvm::Constant *format_const = llvm::ConstantDataArray::getString(getGlobalContext(), constValue);
+    llvm::Constant *format_const = llvm::ConstantDataArray::getString(MyContext, constValue);
     llvm::GlobalVariable *var =
         new llvm::GlobalVariable(
-            *context.module, llvm::ArrayType::get(llvm::IntegerType::get(getGlobalContext(), 8), strlen(constValue)+1),
+            *context.module, llvm::ArrayType::get(llvm::IntegerType::get(MyContext, 8), strlen(constValue)+1),
             true, llvm::GlobalValue::PrivateLinkage, format_const, ".str");
     llvm::Constant *zero =
-        llvm::Constant::getNullValue(llvm::IntegerType::getInt32Ty(getGlobalContext()));
+        llvm::Constant::getNullValue(llvm::IntegerType::getInt32Ty(MyContext));
 
     std::vector<llvm::Constant*> indices;
     indices.push_back(zero);
     indices.push_back(zero);
     llvm::Constant *var_ref = llvm::ConstantExpr::getGetElementPtr(
-	llvm::ArrayType::get(llvm::IntegerType::get(getGlobalContext(), 8), strlen(constValue)+1),
+	llvm::ArrayType::get(llvm::IntegerType::get(MyContext, 8), strlen(constValue)+1),
         var, indices);
 
     std::vector<Value*> args;
@@ -68,7 +68,7 @@ void createEchoFunction(CodeGenContext& context, llvm::Function* printfFn)
     args.push_back(toPrint);
     
 	CallInst *call = CallInst::Create(printfFn, makeArrayRef(args), "", bblock);
-	ReturnInst::Create(getGlobalContext(), bblock);
+	ReturnInst::Create(MyContext, bblock);
 	context.popBlock();
 }
 

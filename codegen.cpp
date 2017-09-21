@@ -11,22 +11,24 @@ void CodeGenContext::generateCode(NBlock& root)
 	
 	/* Create the top level interpreter function to call as entry */
 	vector<Type*> argTypes;
-	FunctionType *ftype = FunctionType::get(Type::getVoidTy(getGlobalContext()), makeArrayRef(argTypes), false);
+	FunctionType *ftype = FunctionType::get(Type::getVoidTy(MyContext), makeArrayRef(argTypes), false);
 	mainFunction = Function::Create(ftype, GlobalValue::InternalLinkage, "main", module);
-	BasicBlock *bblock = BasicBlock::Create(getGlobalContext(), "entry", mainFunction, 0);
+	BasicBlock *bblock = BasicBlock::Create(MyContext, "entry", mainFunction, 0);
 	
 	/* Push a new variable/block context */
 	pushBlock(bblock);
 	root.codeGen(*this); /* emit bytecode for the toplevel block */
-	ReturnInst::Create(getGlobalContext(), bblock);
+	ReturnInst::Create(MyContext, bblock);
 	popBlock();
 	
 	/* Print the bytecode in a human-readable format 
 	   to see if our program compiled properly
 	 */
 	std::cout << "Code is generated.\n";
-	PassManager<Module> pm;
-	pm.addPass(PrintModulePass(outs()));
+	// module->dump();
+
+	legacy::PassManager pm;
+	pm.add(createPrintModulePass(outs()));
 	pm.run(*module);
 }
 
@@ -45,12 +47,12 @@ GenericValue CodeGenContext::runCode() {
 static Type *typeOf(const NIdentifier& type) 
 {
 	if (type.name.compare("int") == 0) {
-		return Type::getInt64Ty(getGlobalContext());
+		return Type::getInt64Ty(MyContext);
 	}
 	else if (type.name.compare("double") == 0) {
-		return Type::getDoubleTy(getGlobalContext());
+		return Type::getDoubleTy(MyContext);
 	}
-	return Type::getVoidTy(getGlobalContext());
+	return Type::getVoidTy(MyContext);
 }
 
 /* -- Code Generation -- */
@@ -58,13 +60,13 @@ static Type *typeOf(const NIdentifier& type)
 Value* NInteger::codeGen(CodeGenContext& context)
 {
 	std::cout << "Creating integer: " << value << endl;
-	return ConstantInt::get(Type::getInt64Ty(getGlobalContext()), value, true);
+	return ConstantInt::get(Type::getInt64Ty(MyContext), value, true);
 }
 
 Value* NDouble::codeGen(CodeGenContext& context)
 {
 	std::cout << "Creating double: " << value << endl;
-	return ConstantFP::get(Type::getDoubleTy(getGlobalContext()), value);
+	return ConstantFP::get(Type::getDoubleTy(MyContext), value);
 }
 
 Value* NIdentifier::codeGen(CodeGenContext& context)
@@ -181,7 +183,7 @@ Value* NFunctionDeclaration::codeGen(CodeGenContext& context)
 	}
 	FunctionType *ftype = FunctionType::get(typeOf(type), makeArrayRef(argTypes), false);
 	Function *function = Function::Create(ftype, GlobalValue::InternalLinkage, id.name.c_str(), context.module);
-	BasicBlock *bblock = BasicBlock::Create(getGlobalContext(), "entry", function, 0);
+	BasicBlock *bblock = BasicBlock::Create(MyContext, "entry", function, 0);
 
 	context.pushBlock(bblock);
 
@@ -197,7 +199,7 @@ Value* NFunctionDeclaration::codeGen(CodeGenContext& context)
 	}
 	
 	block.codeGen(context);
-	ReturnInst::Create(getGlobalContext(), context.getCurrentReturnValue(), bblock);
+	ReturnInst::Create(MyContext, context.getCurrentReturnValue(), bblock);
 
 	context.popBlock();
 	std::cout << "Creating function: " << id.name << endl;
