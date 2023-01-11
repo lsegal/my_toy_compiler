@@ -13,6 +13,8 @@ llvm::Function* createPrintfFunction(CodeGenContext& context)
     std::vector<llvm::Type*> printf_arg_types;
     printf_arg_types.push_back(llvm::Type::getInt8PtrTy(MyContext)); //char*
 
+    std::cout << "printf" << std::endl;
+
     llvm::FunctionType* printf_type =
         llvm::FunctionType::get(
             llvm::Type::getInt32Ty(MyContext), printf_arg_types, true);
