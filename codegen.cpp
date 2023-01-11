@@ -28,6 +28,7 @@ void CodeGenContext::generateCode(NBlock& root)
 	// module->dump();
 
 	legacy::PassManager pm;
+	// TODO:
 	pm.add(createPrintModulePass(outs()));
 	pm.run(*module);
 }
@@ -76,7 +77,9 @@ Value* NIdentifier::codeGen(CodeGenContext& context)
 		std::cerr << "undeclared variable " << name << endl;
 		return NULL;
 	}
-	return new LoadInst(context.locals()[name], "", false, context.currentBlock());
+
+	// return nullptr;  
+	return new LoadInst(context.locals()[name]->getType(),context.locals()[name], name, false, context.currentBlock());
 }
 
 Value* NMethodCall::codeGen(CodeGenContext& context)
@@ -97,6 +100,7 @@ Value* NMethodCall::codeGen(CodeGenContext& context)
 
 Value* NBinaryOperator::codeGen(CodeGenContext& context)
 {
+
 	std::cout << "Creating binary operation " << op << endl;
 	Instruction::BinaryOps instr;
 	switch (op) {
@@ -107,7 +111,6 @@ Value* NBinaryOperator::codeGen(CodeGenContext& context)
 				
 		/* TODO comparison */
 	}
-
 	return NULL;
 math:
 	return BinaryOperator::Create(instr, lhs.codeGen(context), 
@@ -153,7 +156,7 @@ Value* NReturnStatement::codeGen(CodeGenContext& context)
 Value* NVariableDeclaration::codeGen(CodeGenContext& context)
 {
 	std::cout << "Creating variable declaration " << type.name << " " << id.name << endl;
-	AllocaInst *alloc = new AllocaInst(typeOf(type), id.name.c_str(), context.currentBlock());
+	AllocaInst *alloc = new AllocaInst(typeOf(type),4, id.name.c_str(), context.currentBlock());
 	context.locals()[id.name] = alloc;
 	if (assignmentExpr != NULL) {
 		NAssignment assn(id, *assignmentExpr);
