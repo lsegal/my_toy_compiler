@@ -1,5 +1,12 @@
 *.o
-parser.cpp
-parser.hpp
-tokens.cpp
 parser
+bin/*
+src/parser.cc
+src/tokens.cc
+src/*.o
+src/*.hpp
+src/*.hh
+Makefile
+CMakeFiles/*
+CMakeCache.txt
+cmake_install.cmake
